@@ -3,7 +3,15 @@
   "version": "1.0.0",
   "description": "Profound.js Space",
   "main": "",
-  "dependencies": {},
+  "dependencies": {
+    "url": "",
+    "magnet-uri": "",
+    "cheerio": "",
+    "sync-request": "",
+    "express": "",
+    "then-request": "",
+    "magnet2torrent-js": ""
+  },
   "devDependencies": {},
   "scripts": {},
   "author": "",
