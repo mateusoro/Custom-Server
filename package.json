@@ -10,7 +10,8 @@
     "sync-request": "",
     "express": "",
     "then-request": "",
-    "magnet2torrent-js": ""
+    "magnet2torrent-js": "",
+    "system-sleep": ""
   },
   "devDependencies": {},
   "scripts": {},

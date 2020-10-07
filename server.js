@@ -4,6 +4,8 @@ var magnet = require("magnet-uri");
 const cheerio = require('cheerio');
 var request = require('then-request');
 var express = require('express');
+var sleep = require('system-sleep');
+
 const Magnet2torrent = require('magnet2torrent-js');
 
 // https://github.com/ngosang/trackerslist
@@ -12,12 +14,12 @@ const trackers = [
     'udp://tracker.open-internet.nl:6969/announce',
     'udp://tracker.leechers-paradise.org:6969/announce'    
 ];
-
-
 const m2t = new Magnet2torrent({
-    trackers,
-    addTrackersToTorrent: true
-});
+                    trackers,
+                    addTrackersToTorrent: true
+                });
+
+var quantidade = 0;
 
 
 lista('https://ondeeubaixo.net/-',1,2)
@@ -54,22 +56,16 @@ function retorno_carregar_links(p) {
         const $ = cheerio.load(res.getBody('utf8'));      
         $("a[href*='magnet:?xt=urn']").each(function (index, elem) {
             
-            try{
-                var mag = this.attribs.href;
-              
-                var parsed = magnet(mag);
-                m2t.getTorrent(mag).then(torrent => {
-                    var arquivos = {}
-                    for(var a in torrent.files){
-                      arquivos[a] = torrent.files[a].name;
-                    }
-                    l(torrent.infoHash);       
-                    l(arquivos);
+            try{                
+                var mag = this.attribs.href;                
+                var parsed = magnet(mag);                        
+                //l(parsed.infoHash);
+                while(quantidade > 10){
+                   l('Esperando: '+quantidade);
+                   sleep(2000);
+                }
+                add_torrent(mag);
 
-                }).catch(e => {
-                    // Timeout or error occured
-                    console.error(e);
-                });
             }catch(e){
               l(mag);
               console.log('Erro')
@@ -77,6 +73,30 @@ function retorno_carregar_links(p) {
 
         });
     });
+
+}
+var liberado = 0;
+function add_torrent(mag){
+    
+  quantidade++;
+  m2t.getTorrent(mag).then(torrent => {
+      
+      var arquivos = {}
+      for(var a in torrent.files){
+        arquivos[a] = torrent.files[a].name;
+      }
+      liberado++;
+      l('Liberado: '+liberado+" "+torrent.infoHash);       
+      //l(arquivos);
+      quantidade--;
+
+  }).catch(e => {
+      // Timeout or error occured
+      quantidade--;
+      console.error(e);
+  });
+    
+
 
 }
 function l(log) {
