@@ -11,7 +11,8 @@
     "express": "",
     "then-request": "",
     "magnet2torrent-js": "",
-    "system-sleep": ""
+    "system-sleep": "",
+    "stringify-object": ""
   },
   "devDependencies": {},
   "scripts": {},

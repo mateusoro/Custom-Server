@@ -5,6 +5,12 @@ const cheerio = require('cheerio');
 var request = require('then-request');
 var express = require('express');
 var sleep = require('system-sleep');
+const stringifyObject = require('stringify-object');
+
+process.on('uncaughtException', function (ex) {
+    console.log("uncaught exception : ")
+    console.log(ex)
+});
 
 const Magnet2torrent = require('magnet2torrent-js');
 
@@ -16,7 +22,8 @@ const trackers = [
 ];
 const m2t = new Magnet2torrent({
                     trackers,
-                    addTrackersToTorrent: true
+                    addTrackersToTorrent: true,
+                    timeout: 20 
                 });
 
 var quantidade = 0;
@@ -60,11 +67,16 @@ function retorno_carregar_links(p) {
                 var mag = this.attribs.href;                
                 var parsed = magnet(mag);                        
                 //l(parsed.infoHash);
-                while(quantidade > 10){
-                   l('Esperando: '+quantidade);
-                   sleep(2000);
+                var records =  pls.query('select * from hash where hash.hash = ?', parsed.infoHash)
+                if(records.length > 0){
+                  l('Já Encontrado: '+parsed.infoHash);
+                }else{
+                  while(quantidade > 2){
+                    l('Esperando: '+quantidade);
+                    sleep(1000);
+                  }
+                  add_torrent(mag);
                 }
-                add_torrent(mag);
 
             }catch(e){
               l(mag);
@@ -86,6 +98,8 @@ function add_torrent(mag){
         arquivos[a] = torrent.files[a].name;
       }
       liberado++;
+     
+      pls.query('insert into hash set ?', {hash:torrent.infoHash, arquivos: stringifyObject(arquivos) })
       l('Liberado: '+liberado+" "+torrent.infoHash);       
       //l(arquivos);
       quantidade--;
