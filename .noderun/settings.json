@@ -1,0 +1,16 @@
+{
+  "sequence": 300,
+  "template name": "Custom Server",
+  "template category": "Node.js / JavaScript",
+  "description": "This workspace deploys a custom server",
+  "image": "/cloud/template-icons/node_js_web_services.png",
+  "routes": {},
+  "app start": "",
+  "custom server": true,
+  "template dir": "custom-server",
+  "current git repository": "",
+  "git repositories": [
+    ""
+  ],
+  "idx": 30
+}
