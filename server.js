@@ -6,6 +6,7 @@ var request = require('then-request');
 var express = require('express');
 var sleep = require('system-sleep');
 const stringifyObject = require('stringify-object');
+var app = express();
 
 var Datastore = require('nedb')
   , db = new Datastore({ filename: 'banco.db', autoload: true });
@@ -27,8 +28,6 @@ const m2t = new Magnet2torrent({
 
 var quantidade = 0;
 
-
-lista('https://ondeeubaixo.net/-',1,2)
 
 function lista(tipo, ini, tamanho) {
 
@@ -137,6 +136,32 @@ function add_torrent(mag){
 
 
 }
+app.get('/carregado', function(req, res){	
+	db.find({ hash: req.query.hash }, function (err, docs) {
+		if(err){
+			  console.log(err);
+		  }else{
+			  //console.log(docs);
+			  if(docs.length > 0){
+				 var text1 = stringifyObject(docs[0]);	
+				  text1 = text1.replace('\n','').replace('\\\'','"')
+				 res.send("<html>"+text1+"</html>"); 
+			  }else{
+				 res.send("<html>Não Carregado</html>");	
+			  }
+		  }
+	});	
+});
+app.get('/', function(req, res){	
+	
+	res.send("<html>Rodando</html>");
+	lista('https://ondeeubaixo.net/-',1,2)
+	
+});
+
 function l(log) {
     console.log(log);
 }
+var porta = process.env.PORT || 3000;
+app.listen(porta);
+console.log("Porta",porta);
