@@ -116,8 +116,7 @@ function add_torrent(mag){
       for(var a in torrent.files){
         arquivos[a] = torrent.files[a].name;
       }
-      liberado++;
-     
+      liberado++;     
 	  db.insert({hash:torrent.infoHash, arquivos: stringifyObject(arquivos) }, function (err, newDoc) {   
 		  if(err){
 			console.log(err);
