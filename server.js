@@ -65,10 +65,14 @@ function retorno_carregar_links(p) {
             try{                
                 var mag = this.attribs.href;                
                 var parsed = magnet(mag);                        
-                //l(parsed.infoHash);
-                //var records =  pls.query('select * from hash where hash.hash = ?', parsed.infoHash)
-                //
+               
 				sleep(1000);
+				if(quantidade > 10){								
+					sleep(2000);
+				}else{
+					sleep(200);					
+				}
+				
 				db.find({ hash: parsed.infoHash }, function (err, docs) {
   					if(err){
 						  console.log(err);
