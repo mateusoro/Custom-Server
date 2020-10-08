@@ -7,10 +7,9 @@ var express = require('express');
 var sleep = require('system-sleep');
 const stringifyObject = require('stringify-object');
 
-process.on('uncaughtException', function (ex) {
-    console.log("uncaught exception : ")
-    console.log(ex)
-});
+var Datastore = require('nedb')
+  , db = new Datastore({ filename: 'banco.db', autoload: true });
+
 
 const Magnet2torrent = require('magnet2torrent-js');
 
@@ -67,16 +66,27 @@ function retorno_carregar_links(p) {
                 var mag = this.attribs.href;                
                 var parsed = magnet(mag);                        
                 //l(parsed.infoHash);
-                var records =  pls.query('select * from hash where hash.hash = ?', parsed.infoHash)
-                if(records.length > 0){
-                  l('Já Encontrado: '+parsed.infoHash);
-                }else{
-                  while(quantidade > 2){
-                    l('Esperando: '+quantidade);
-                    sleep(1000);
-                  }
-                  add_torrent(mag);
-                }
+                //var records =  pls.query('select * from hash where hash.hash = ?', parsed.infoHash)
+                //
+				sleep(1000);
+				db.find({ hash: parsed.infoHash }, function (err, docs) {
+  					if(err){
+						  console.log(err);
+					  }else{
+						  //console.log(docs);
+						  if(docs.length > 0){
+							 l('Já Encontrado: '+parsed.infoHash);
+					      }else{
+							  while(quantidade > 10){
+								l('Esperando: '+quantidade);
+								sleep(1000);
+							  }
+							  add_torrent(mag);
+						  }
+					  }
+				});
+                 
+                //}
 
             }catch(e){
               l(mag);
@@ -90,8 +100,13 @@ function retorno_carregar_links(p) {
 var liberado = 0;
 function add_torrent(mag){
     
-  quantidade++;
-  m2t.getTorrent(mag).then(torrent => {
+  	quantidade++;
+	const m2t = new Magnet2torrent({
+					trackers,
+					addTrackersToTorrent: true,
+					timeout: 20 
+				});
+  	m2t.getTorrent(mag).then(torrent => {
       
       var arquivos = {}
       for(var a in torrent.files){
@@ -99,16 +114,22 @@ function add_torrent(mag){
       }
       liberado++;
      
-      pls.query('insert into hash set ?', {hash:torrent.infoHash, arquivos: stringifyObject(arquivos) })
-      l('Liberado: '+liberado+" "+torrent.infoHash);       
+	  db.insert({hash:torrent.infoHash, arquivos: stringifyObject(arquivos) }, function (err, newDoc) {   
+		  if(err){
+			console.log(err);
+		  }else{
+			l('Liberado: '+liberado+" "+torrent.infoHash);  
+		  }
+		});
+      
       //l(arquivos);
       quantidade--;
 
-  }).catch(e => {
+  	}).catch(e => {
       // Timeout or error occured
       quantidade--;
       console.error(e);
-  });
+  	});
     
 
 

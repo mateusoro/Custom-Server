@@ -4,15 +4,16 @@
   "description": "Profound.js Space",
   "main": "",
   "dependencies": {
-    "url": "",
-    "magnet-uri": "",
     "cheerio": "",
-    "sync-request": "",
     "express": "",
-    "then-request": "",
+    "magnet-uri": "",
     "magnet2torrent-js": "",
+    "nedb": "^1.8.0",
+    "stringify-object": "",
+    "sync-request": "",
     "system-sleep": "",
-    "stringify-object": ""
+    "then-request": "",
+    "url": ""
   },
   "devDependencies": {},
   "scripts": {},
